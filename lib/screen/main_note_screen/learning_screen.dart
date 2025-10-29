@@ -1,230 +1,129 @@
 import 'package:flutter/material.dart';
-import '../../services/pitch_detection_service.dart';
+import 'package:flutter_piano_audio_detection/flutter_piano_audio_detection.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class LearningScreen extends StatefulWidget {
-  const LearningScreen({super.key});
+  const LearningScreen({Key? key}) : super(key: key);
 
   @override
   State<LearningScreen> createState() => _LearningScreenState();
 }
 
 class _LearningScreenState extends State<LearningScreen> {
-  final PitchDetectionService _pitchService = PitchDetectionService();
-
-  String _currentNote = '--';
-  double _currentFrequency = 0.0;
-  double _currentProbability = 0.0;
-  bool _isRecording = false;
+  final FlutterPianoAudioDetection fpad = FlutterPianoAudioDetection();
+  Stream<List<dynamic>>? result;
+  List<String> detectedNotes = [];
+  bool isRecording = false;
+  bool isReady = false;
+  double volumeThreshold = 0.5;
 
   @override
   void initState() {
     super.initState();
-    _initializePitchDetection();
+    _initializePianoDetection();
   }
 
-  void _initializePitchDetection() {
-    _pitchService.initialize();
-
-    // Callback khi phát hiện pitch
-    _pitchService.onPitchDetected = (note, frequency, probability) {
-      if (mounted) {
-        setState(() {
-          _currentNote = note;
-          _currentFrequency = frequency;
-          _currentProbability = probability;
-        });
+  Future<void> _initializePianoDetection() async {
+    try {
+      if (await Permission.microphone.request().isGranted) {
+        await fpad.prepare();
+        setState(() => isReady = true);
+        _showSnackBar('Sẵn sàng nhận diện nốt nhạc!');
+      } else {
+        _showSnackBar('Cần quyền microphone để nhận diện âm thanh!');
       }
-    };
-
-    // Callback khi trạng thái recording thay đổi
-    _pitchService.onRecordingStateChanged = (isRecording) {
-      if (mounted) {
-        setState(() {
-          _isRecording = isRecording;
-        });
-      }
-    };
-  }
-
-  void _toggleRecording() async {
-    if (_isRecording) {
-      await _pitchService.stopRecording();
-      setState(() {
-        _currentNote = '--';
-        _currentFrequency = 0.0;
-        _currentProbability = 0.0;
-      });
-    } else {
-      await _pitchService.startRecording();
+    } catch (e) {
+      _showSnackBar('Lỗi khởi tạo: $e');
     }
+  }
+
+  void _startDetection() {
+    if (!isReady) {
+      _showSnackBar('Engine chưa sẵn sàng!');
+      return;
+    }
+    fpad.start();
+    _getResult();
+    setState(() => isRecording = true);
+    _showSnackBar('Đang nhận diện...');
+  }
+
+  void _stopDetection() {
+    fpad.stop();
+    setState(() {
+      isRecording = false;
+      detectedNotes.clear();
+    });
+    _showSnackBar('Đã dừng nhận diện.');
+  }
+
+  void _getResult() {
+    result = fpad.startAudioRecognition();
+    result!.listen((event) {
+      List<dynamic> filteredEvent = event
+          .where((e) => (e["velocity"] as double) > volumeThreshold)
+          .toList();
+      setState(() {
+        detectedNotes = fpad.getNotes(filteredEvent);
+      });
+    });
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: const Duration(seconds: 2),
+      ),
+    );
   }
 
   @override
   void dispose() {
-    _pitchService.dispose();
+    if (isRecording) fpad.stop();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    // Sử dụng Theme để lấy màu sắc nhất quán
+    final theme = Theme.of(context);
+
     return Scaffold(
+      backgroundColor: const Color(0xFF1C1C1E), // Nền tối
       appBar: AppBar(
-        title: const Text('Pitch Detection - Learning'),
-        backgroundColor: Colors.deepPurple,
+        title: const Text('Piano Note Detector'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: true,
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Colors.deepPurple.shade50,
-              Colors.white,
-            ],
-          ),
-        ),
-        child: Center(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Icon microphone với animation
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                padding: const EdgeInsets.all(30),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color:
-                      _isRecording ? Colors.red.shade100 : Colors.grey.shade200,
-                  boxShadow: _isRecording
-                      ? [
-                          BoxShadow(
-                            color: Colors.red.withOpacity(0.5),
-                            blurRadius: 20,
-                            spreadRadius: 5,
-                          )
-                        ]
-                      : [],
-                ),
-                child: Icon(
-                  _isRecording ? Icons.mic : Icons.mic_none,
-                  size: 80,
-                  color: _isRecording ? Colors.red : Colors.grey,
-                ),
+              // Phần hiển thị trạng thái (đã tối giản)
+              _buildStatusIndicator(),
+
+              const SizedBox(height: 16),
+
+              // Slider điều chỉnh ngưỡng âm lượng
+              _buildVolumeThresholdSlider(),
+
+              const SizedBox(height: 24),
+
+              // Phần hiển thị nốt nhạc
+              Expanded(
+                child: _buildNotesDisplayArea(theme),
               ),
 
-              const SizedBox(height: 60),
+              const SizedBox(height: 24),
 
-              // Hiển thị nốt nhạc hiện tại
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 10,
-                      offset: const Offset(0, 5),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    const Text(
-                      'Nốt nhạc',
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.grey,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      _currentNote,
-                      style: TextStyle(
-                        fontSize: 72,
-                        fontWeight: FontWeight.bold,
-                        color: _isRecording ? Colors.deepPurple : Colors.grey,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              // Nút điều khiển
+              _buildControlButtons(),
 
-              const SizedBox(height: 40),
-
-              // Thông tin chi tiết
-              if (_isRecording && _currentFrequency > 0)
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  margin: const EdgeInsets.symmetric(horizontal: 40),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(15),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 10,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      _buildInfoRow(
-                        'Tần số',
-                        '${_currentFrequency.toStringAsFixed(2)} Hz',
-                      ),
-                      const SizedBox(height: 10),
-                      _buildInfoRow(
-                        'Độ chính xác',
-                        '${(_currentProbability * 100).toStringAsFixed(1)}%',
-                      ),
-                    ],
-                  ),
-                ),
-
-              const SizedBox(height: 60),
-
-              // Nút bắt đầu/dừng
-              ElevatedButton(
-                onPressed: _toggleRecording,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      _isRecording ? Colors.red : Colors.deepPurple,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  elevation: 5,
-                ),
-                child: Text(
-                  _isRecording ? 'Dừng ghi âm' : 'Bắt đầu ghi âm',
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // Hướng dẫn
-              if (!_isRecording)
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 40),
-                  child: Text(
-                    'Nhấn nút để bắt đầu ghi âm và phát hiện nốt nhạc',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
+              const SizedBox(height: 16),
             ],
           ),
         ),
@@ -232,23 +131,130 @@ class _LearningScreenState extends State<LearningScreen> {
     );
   }
 
-  Widget _buildInfoRow(String label, String value) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  // Widget con cho khu vực trạng thái
+  Widget _buildStatusIndicator() {
+    return Column(
       children: [
+        Icon(
+          isRecording ? Icons.mic : Icons.mic_none,
+          size: 48,
+          color: isRecording ? Colors.redAccent : Colors.white54,
+        ),
+        const SizedBox(height: 8),
         Text(
-          label,
-          style: const TextStyle(
+          isRecording ? 'ĐANG GHI ÂM' : 'NHẤN ĐỂ BẮT ĐẦU',
+          style: TextStyle(
             fontSize: 16,
-            color: Colors.grey,
+            fontWeight: FontWeight.w600,
+            color: isRecording ? Colors.redAccent : Colors.white54,
+            letterSpacing: 1.2,
           ),
         ),
+      ],
+    );
+  }
+
+  // Widget con cho khu vực hiển thị nốt nhạc
+  Widget _buildNotesDisplayArea(ThemeData theme) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: detectedNotes.isEmpty
+          ? Center(
+              child: Text(
+                isRecording ? 'Đang lắng nghe...' : 'Chưa có dữ liệu',
+                style: TextStyle(fontSize: 18, color: Colors.grey.shade600),
+              ),
+            )
+          : SingleChildScrollView(
+              padding: const EdgeInsets.all(20.0),
+              child: Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                alignment: WrapAlignment.center,
+                children: detectedNotes.map((note) {
+                  return Chip(
+                    label: Text(note),
+                    labelStyle: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                    backgroundColor: Colors.amberAccent,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 18,
+                      vertical: 10,
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+    );
+  }
+
+  // Widget con cho slider ngưỡng âm lượng
+  Widget _buildVolumeThresholdSlider() {
+    return Column(
+      children: [
         Text(
-          value,
+          'Ngưỡng âm lượng: ${(volumeThreshold * 100).round()}%',
           style: const TextStyle(
             fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Colors.deepPurple,
+            fontWeight: FontWeight.w500,
+            color: Colors.white70,
+          ),
+        ),
+        Slider(
+          value: volumeThreshold,
+          min: 0.0,
+          max: 1.0,
+          divisions: 100,
+          activeColor: Colors.blueAccent,
+          inactiveColor: Colors.grey.shade600,
+          onChanged: (value) {
+            setState(() {
+              volumeThreshold = value;
+            });
+          },
+        ),
+      ],
+    );
+  }
+
+  // Widget con cho các nút điều khiển
+  Widget _buildControlButtons() {
+    return Row(
+      children: [
+        Expanded(
+          child: FilledButton.icon(
+            onPressed: isReady && !isRecording ? _startDetection : null,
+            icon: const Icon(Icons.play_arrow),
+            label: const Text('BẮT ĐẦU'),
+            style: FilledButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              textStyle:
+                  const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              backgroundColor: Colors.blueAccent,
+              disabledBackgroundColor: Colors.grey.shade800,
+            ),
+          ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: FilledButton.icon(
+            onPressed: isRecording ? _stopDetection : null,
+            icon: const Icon(Icons.stop),
+            label: const Text('DỪNG'),
+            style: FilledButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              textStyle:
+                  const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              backgroundColor: Colors.redAccent.withOpacity(0.8),
+              disabledBackgroundColor: Colors.grey.shade800,
+            ),
           ),
         ),
       ],

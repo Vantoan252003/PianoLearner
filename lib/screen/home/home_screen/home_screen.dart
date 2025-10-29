@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pianist_vip_pro/screen/courses/course_screen.dart';
+import 'package:pianist_vip_pro/screen/lessons/lesson_screen.dart';
 import 'package:pianist_vip_pro/screen/main_note_screen/learning_screen.dart';
 import 'package:pianist_vip_pro/screen/practice/practice_screen.dart';
 import 'package:pianist_vip_pro/screen/profile_settings/settings_screen.dart';
@@ -166,6 +167,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                       progress:
                                           '0%', // TODO: Lấy progress thực tế từ API
                                       gradientColors: gradientColors,
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => LessonScreen(
+                                                courseId: course.courseId),
+                                          ),
+                                        );
+                                      },
                                     );
                                   },
                                 ),

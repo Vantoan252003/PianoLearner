@@ -7,7 +7,6 @@ import 'package:pianist_vip_pro/models/courses_model.dart';
 class CoursesService {
   Future<List<Courses>> getCourses([String? token]) async {
     token ??= await TokenStorage.getToken();
-    print(token);
     final response = await http.get(
         Uri.parse("${ApiEndpoint.baseUrl}${ApiEndpoint.getCourses}"),
         headers: {
