@@ -4,7 +4,7 @@ import 'package:flutter_piano_pro/flutter_piano_pro.dart';
 import 'package:flutter_piano_pro/note_model.dart';
 import 'package:flutter/services.dart';
 import '../../../services/practice_service/get_piano_colors.dart';
-import '../../../services/soundfont_service.dart';
+import '../../../services/common_service/soundfont_service.dart';
 
 class VirtualPianoScreen extends StatefulWidget {
   const VirtualPianoScreen({super.key});

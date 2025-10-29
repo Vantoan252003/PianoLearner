@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:pianist_vip_pro/screen/courses/course_screen.dart';
-import 'package:pianist_vip_pro/services/lesson_service.dart';
+import 'package:pianist_vip_pro/services/lesson_service/lesson_service.dart';
 import 'package:pianist_vip_pro/models/lesson_model.dart';
+import 'package:pianist_vip_pro/screen/piano_question/piano_question_screen.dart';
 
 class LessonScreen extends StatefulWidget {
   final int courseId;
@@ -145,6 +146,16 @@ class _LessonScreenState extends State<LessonScreen> {
                                       description: lesson.description,
                                       progress: 'Bài ${lesson.lessonOrder}',
                                       gradientColors: gradientColors,
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                PianoQuestionScreen(
+                                                    lessonId: lesson.lessonId),
+                                          ),
+                                        );
+                                      },
                                     );
                                   },
                                 ),

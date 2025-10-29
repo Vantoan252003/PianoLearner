@@ -6,4 +6,5 @@ class ApiEndpoint {
   //courses
   static const String getCourses = '/auth/courses';
   static const String getLessons = '/auth/course/lesson/{courseId}';
+  static const String getPianoQuestions = '/auth/piano-question/{lessonId}';
 }

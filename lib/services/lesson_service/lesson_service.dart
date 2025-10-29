@@ -2,7 +2,7 @@ import 'package:http/http.dart' as http;
 import 'package:pianist_vip_pro/api/api_endpoint.dart';
 import 'package:pianist_vip_pro/auth/auth_process/token_storage.dart';
 import 'dart:convert';
-import '../models/lesson_model.dart';
+import '../../models/lesson_model.dart';
 
 class LessonService {
   Future<List<Lesson>> fetchLessons(int? courseId) async {

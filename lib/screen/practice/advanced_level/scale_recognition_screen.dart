@@ -5,7 +5,7 @@ import 'package:pianist_vip_pro/screen/main_widget_function/header_game_ui.dart'
 import 'package:pianist_vip_pro/services/practice_service/get_piano_colors.dart';
 import 'dart:math';
 
-import 'package:pianist_vip_pro/services/soundfont_service.dart';
+import 'package:pianist_vip_pro/services/common_service/soundfont_service.dart';
 
 class ScaleRecognitionScreen extends StatefulWidget {
   const ScaleRecognitionScreen({Key? key}) : super(key: key);

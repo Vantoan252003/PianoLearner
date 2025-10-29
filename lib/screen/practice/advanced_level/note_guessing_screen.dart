@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pianist_vip_pro/screen/main_widget_function/custom_piano.dart';
 import 'package:pianist_vip_pro/screen/main_widget_function/header_game_ui.dart';
-import 'package:pianist_vip_pro/services/soundfont_service.dart';
+import 'package:pianist_vip_pro/services/common_service/soundfont_service.dart';
 import 'dart:math';
 import 'package:flutter_piano_pro/note_model.dart';
 import '../../main_widget_function/treble_music_staff.dart';
