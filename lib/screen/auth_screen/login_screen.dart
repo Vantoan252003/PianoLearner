@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pianist_vip_pro/screen/home/home_screen/home_screen.dart';
+import 'package:pianist_vip_pro/screen/home/home_screen.dart';
 import 'package:pianist_vip_pro/auth/auth_process/login_process.dart';
 import 'multi_step_register_screen.dart';
 

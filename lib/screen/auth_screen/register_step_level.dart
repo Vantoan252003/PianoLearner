@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pianist_vip_pro/providers/register_provider.dart';
 import 'package:pianist_vip_pro/auth/auth_process/register_process.dart';
-import 'package:pianist_vip_pro/screen/home/home_screen/home_screen.dart';
+import 'package:pianist_vip_pro/screen/home/home_screen.dart';
 
 class RegisterStepLevel extends StatefulWidget {
   final Function() onPrevious;

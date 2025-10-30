@@ -8,7 +8,7 @@ import 'package:pianist_vip_pro/screen/main_widget_function/practice_header.dart
 import '../../../services/practice_service/get_piano_colors.dart';
 import '../../../services/common_service/soundfont_service.dart';
 import '../../../services/piano_question_service/piano_question_service.dart';
-import '../../../services/piano_detection_service.dart';
+import '../../services/common_service/piano_detection_service.dart';
 import '../../../models/piano_question_model.dart';
 
 class PianoQuestionScreen extends StatefulWidget {

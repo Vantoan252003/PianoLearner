@@ -30,6 +30,7 @@ class AuthService {
 
       final userObj = User.fromJson(user);
       await TokenStorage.saveUserInfo(userObj.fullName, userObj.email);
+      await TokenStorage.saveUser(userObj); // Save full user object
 
       return userObj;
     } else {
@@ -73,6 +74,7 @@ class AuthService {
 
       final userObj = User.fromJson(user as Map<String, dynamic>);
       await TokenStorage.saveUserInfo(userObj.fullName, userObj.email);
+      await TokenStorage.saveUser(userObj); // Save full user object
 
       return userObj;
     } else {
