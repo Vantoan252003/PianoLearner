@@ -54,7 +54,7 @@ class PracticeCard extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               description,
-              style: TextStyle(fontSize: 11, color: Colors.white70),
+              style: const TextStyle(fontSize: 11, color: Colors.white70),
               textAlign: TextAlign.center,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,

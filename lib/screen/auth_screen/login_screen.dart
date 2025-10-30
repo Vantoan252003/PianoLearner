@@ -60,19 +60,17 @@ class _LoginScreenState extends State<LoginScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: 40),
-                // Logo Piano với gradient
-                Center(
-                  child: Container(
+                const Center(
+                  child: SizedBox(
                     width: 100,
                     height: 100,
-                    child: const Icon(
+                    child: Icon(
                       Icons.piano,
                       size: 80,
                     ),
                   ),
                 ),
                 const SizedBox(height: 24),
-                // Tiêu đề với gradient
                 ShaderMask(
                   shaderCallback: (bounds) => const LinearGradient(
                     colors: [
@@ -102,7 +100,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: 48),
-                // Email field
                 TextField(
                   controller: _emailController,
                   focusNode: _emailFocus,
@@ -232,26 +229,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     Expanded(child: Divider(color: Colors.grey)),
                   ],
                 ),
-                const SizedBox(height: 24),
-                // Nút đăng nhập với Google
-                OutlinedButton.icon(
-                  onPressed: () {
-                    // TODO: Xử lý đăng nhập Google
-                  },
-                  icon: const Icon(Icons.g_mobiledata,
-                      size: 28, color: Colors.black),
-                  label: const Text(
-                    'Tiếp tục với Google',
-                    style: TextStyle(color: Colors.black),
-                  ),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    side: const BorderSide(color: Colors.black),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
+
                 const SizedBox(height: 32),
                 // Chuyển sang đăng ký
                 Row(

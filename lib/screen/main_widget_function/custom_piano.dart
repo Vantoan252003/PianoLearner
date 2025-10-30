@@ -7,6 +7,7 @@ class CustomPiano extends StatelessWidget {
   final Function(NoteModel?) onNotePressed;
   final double whiteHeight;
   final int noteCount;
+  final double blackHeight;
 
   const CustomPiano({
     Key? key,
@@ -14,6 +15,7 @@ class CustomPiano extends StatelessWidget {
     required this.onNotePressed,
     this.whiteHeight = 200,
     this.noteCount = 7,
+    this.blackHeight = 50,
   }) : super(key: key);
 
   @override

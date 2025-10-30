@@ -62,64 +62,28 @@ class StaffAndNotePainter extends CustomPainter {
         'C5': 1.5, // C5 - khoảng trống thứ 3
       };
 
-      // Map về tên nốt thực (không phụ thuộc dấu hóa) để vẽ đúng vị trí
-      final Map<String, String> realNoteNames = {
-        'C': 'C',
-        'C#': 'C',
-        'Db': 'D',
-        'D': 'D',
-        'D#': 'D',
-        'Eb': 'E',
-        'E': 'E',
-        'Fb': 'F',
-        'F': 'F',
-        'F#': 'F',
-        'Gb': 'G',
-        'G': 'G',
-        'G#': 'G',
-        'Ab': 'A',
-        'A': 'A',
-        'A#': 'A',
-        'Bb': 'B',
-        'B': 'B',
-        'Cb': 'C5',
-      };
-
-      // Lấy vị trí nốt nhạc trên khuông nhạc
       final positionIndex = notePositions[note!] ?? 2.0;
       final yPosition = 5 + positionIndex * lineSpacing;
 
-      // Vẽ đường kẻ phụ TRƯỚC KHI vẽ nốt để nốt được hiển thị đè lên đường kẻ
-      // Vẽ đường kẻ phụ nếu nốt nằm ngoài khuông
       if (positionIndex >= 4.0 || positionIndex <= 1.0) {
-        // Xác định các đường kẻ phụ cần vẽ
         List<double> auxiliaryLines = [];
 
-        // Nếu nốt nằm dưới khuông nhạc (C4, D4)
         if (positionIndex >= 4.0) {
-          // Với C4, cần đường kẻ phụ tại positionIndex 5.0
           if (positionIndex >= 5.0) {
             auxiliaryLines.add(5.0);
           }
-          // Nếu có nốt thấp hơn C4, thêm đường kẻ phụ tiếp theo
-          // (Hiện tại chưa cần thiết trong ứng dụng này)
 
-          // Thêm đường kẻ phụ cho các nốt nằm trên dòng kẻ phụ (C4)
           if (positionIndex.round() == positionIndex) {
             auxiliaryLines.add(positionIndex);
           }
         }
 
-        // Nếu nốt nằm trên khuông nhạc (B5, C5 và cao hơn)
         if (positionIndex <= 1.0) {
           // Với C5, cần đường kẻ phụ tại positionIndex 1.0
           if (positionIndex <= 1.0) {
             auxiliaryLines.add(1.0);
           }
-          // Nếu có nốt cao hơn C5, thêm đường kẻ phụ tiếp theo
-          // (Hiện tại chưa cần thiết trong ứng dụng này)
 
-          // Thêm đường kẻ phụ cho các nốt nằm trên dòng kẻ phụ
           if (positionIndex.round() == positionIndex) {
             auxiliaryLines.add(positionIndex);
           }

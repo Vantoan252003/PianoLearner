@@ -15,7 +15,7 @@ class _LearningScreenState extends State<LearningScreen> {
   List<String> detectedNotes = [];
   bool isRecording = false;
   bool isReady = false;
-  double volumeThreshold = 0.5;
+  double volumeThreshold = 0.7;
 
   @override
   void initState() {

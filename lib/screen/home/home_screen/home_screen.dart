@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pianist_vip_pro/screen/courses/course_screen.dart';
 import 'package:pianist_vip_pro/screen/lessons/lesson_screen.dart';
-import 'package:pianist_vip_pro/screen/main_note_screen/learning_screen.dart';
+import 'package:pianist_vip_pro/screen/main_note_screen/note_detection_test_screen.dart';
 import 'package:pianist_vip_pro/screen/practice/practice_screen.dart';
 import 'package:pianist_vip_pro/screen/profile_settings/settings_screen.dart';
 import 'package:pianist_vip_pro/services/courses_service/courses_service.dart';

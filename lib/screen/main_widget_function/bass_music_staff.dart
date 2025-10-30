@@ -60,29 +60,6 @@ class BassStaffAndNotePainter extends CustomPainter {
         'B#': -0.5,
       };
 
-      final Map<String, String> realNoteNames = {
-        'C': 'C',
-        'C#': 'C',
-        'Db': 'D',
-        'D': 'D',
-        'D#': 'D',
-        'Eb': 'E',
-        'E': 'E',
-        'Fb': 'F',
-        'F': 'F',
-        'F#': 'F',
-        'Gb': 'G',
-        'G': 'G',
-        'G#': 'G',
-        'Ab': 'A',
-        'A': 'A',
-        'A#': 'A',
-        'Bb': 'B',
-        'B': 'B',
-        'Cb': 'C4',
-        'B#': 'C',
-      };
-
       // Lấy vị trí nốt nhạc trên khuông nhạc
       final positionIndex = notePositions[note!] ?? 2.0;
       final yPosition = 5 + positionIndex * lineSpacing;
