@@ -5,10 +5,7 @@ import 'package:pianist_vip_pro/screen/practice/practice_screen.dart';
 import 'package:pianist_vip_pro/screen/profile_settings/settings_screen.dart';
 import 'package:pianist_vip_pro/screen/achievements/achievements_screen.dart';
 import 'package:pianist_vip_pro/services/courses_service/courses_service.dart';
-import 'package:pianist_vip_pro/services/achievements/achievements_service.dart'
-    as achievement_service;
 import 'package:pianist_vip_pro/models/courses_model.dart';
-import 'package:pianist_vip_pro/models/achievements_model.dart';
 import 'package:pianist_vip_pro/models/user_model.dart';
 import 'package:pianist_vip_pro/screen/home/widgets/user_header.dart';
 import 'package:pianist_vip_pro/screen/home/widgets/practice_stats.dart';

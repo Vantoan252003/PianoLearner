@@ -7,7 +7,6 @@ import '../../models/lesson_model.dart';
 class LessonService {
   Future<List<Lesson>> fetchLessons(int? courseId) async {
     String? token = await TokenStorage.getToken();
-    print('in ra token $token');
     final response = await http.get(
         Uri.parse(
             "${ApiEndpoint.baseUrl}${ApiEndpoint.getLessons.replaceAll('{courseId}', courseId.toString())}"),

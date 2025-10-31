@@ -9,11 +9,11 @@ class StaffAndNotePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
       ..color = Colors.white
-      ..strokeWidth = 1.5
+      ..strokeWidth = 2
       ..style = PaintingStyle.stroke;
 
     // Vẽ 5 đường kẻ khuông nhạc
-    double lineSpacing = (size.height - 40) / 4;
+    double lineSpacing = (size.height - 20) / 4;
     for (int i = 0; i < 5; i++) {
       canvas.drawLine(
         Offset(20, 5 + i * lineSpacing),
@@ -21,14 +21,12 @@ class StaffAndNotePainter extends CustomPainter {
         paint,
       );
     }
-
-    // Vẽ khóa Sol (Treble Clef) bằng Text
     TextPainter(
       text: const TextSpan(
         text: '\u{1D11E}',
         style: TextStyle(
           fontFamily: 'MusicalSymbols',
-          fontSize: 105,
+          fontSize: 50,
           color: Colors.white,
           fontWeight: FontWeight.bold,
         ),
@@ -36,7 +34,7 @@ class StaffAndNotePainter extends CustomPainter {
       textDirection: TextDirection.ltr,
     )
       ..layout()
-      ..paint(canvas, Offset(20, 5 + lineSpacing - 30));
+      ..paint(canvas, Offset(20, 5 + lineSpacing - 10));
 
     if (note != null) {
       final Map<String, double> notePositions = {
@@ -107,8 +105,8 @@ class StaffAndNotePainter extends CustomPainter {
       canvas.drawOval(
         Rect.fromCenter(
           center: Offset(size.width / 2, yPosition),
-          width: 30,
-          height: 25,
+          width: 20,
+          height: 15,
         ),
         notePaint,
       );
@@ -121,7 +119,7 @@ class StaffAndNotePainter extends CustomPainter {
                 ? '\u{266F}'
                 : '\u{266D}', // Chỉ vẽ dấu thăng hoặc giáng
             style: const TextStyle(
-              fontSize: 40,
+              fontSize: 35,
               color: Colors.white,
               fontWeight: FontWeight.bold,
             ),
@@ -129,7 +127,7 @@ class StaffAndNotePainter extends CustomPainter {
           textDirection: TextDirection.ltr,
         )
           ..layout()
-          ..paint(canvas, Offset(size.width / 2 - 45, yPosition - 38));
+          ..paint(canvas, Offset(size.width / 2 - 45, yPosition - 30));
       }
     }
   }

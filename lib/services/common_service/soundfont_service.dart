@@ -30,11 +30,8 @@ class SoundfontService {
 
   static void dispose() {
     if (_sfId != null) {
-      try {
-        _midiPro.unloadSoundfont(_sfId!);
-      } catch (e) {
-        print('Error unloading soundfont: $e');
-      }
+      _midiPro.unloadSoundfont(_sfId!);
+
       _sfId = null;
       _isLoaded = false;
     }

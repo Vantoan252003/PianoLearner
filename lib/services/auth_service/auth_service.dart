@@ -57,10 +57,6 @@ class AuthService {
       final expiresAt = data['expiresAt'];
       final user = data['user'];
 
-      // Debug: Print response để kiểm tra dữ liệu
-      print('Register response: $data');
-      print('User data: $user');
-
       if (user == null) {
         throw Exception('User data is null in response');
       }

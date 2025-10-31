@@ -1,17 +1,12 @@
 import 'package:flutter/material.dart';
 
-/// App Theme Colors - Piano VIP Pro
-/// Màu sắc chủ đạo của ứng dụng: Đen & Trắng với các điểm nhấn
-
 class AppColors {
-  // Primary Colors - Màu chính
   static const Color primaryBlack = Colors.black;
   static final Color primaryGrey900 = Colors.grey.shade900;
   static final Color primaryGrey800 = Colors.grey.shade800;
   static final Color primaryGrey700 = Colors.grey.shade700;
   static const Color primaryWhite = Colors.white;
 
-  // Background Gradients
   static LinearGradient mainBackgroundGradient = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,

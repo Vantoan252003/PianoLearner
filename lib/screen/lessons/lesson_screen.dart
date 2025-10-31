@@ -3,6 +3,10 @@ import 'package:pianist_vip_pro/screen/courses/course_screen.dart';
 import 'package:pianist_vip_pro/services/lesson_service/lesson_service.dart';
 import 'package:pianist_vip_pro/models/lesson_model.dart';
 import 'package:pianist_vip_pro/screen/piano_question/piano_question_screen.dart';
+import 'package:pianist_vip_pro/screen/piano_question/sheet_question_screen.dart';
+import 'package:pianist_vip_pro/services/user_progress_service/user_progress_service.dart';
+import 'package:pianist_vip_pro/models/user_progress_model.dart';
+import 'package:pianist_vip_pro/screen/home/widgets/app_theme.dart';
 
 class LessonScreen extends StatefulWidget {
   final int courseId;
@@ -15,9 +19,11 @@ class LessonScreen extends StatefulWidget {
 
 class _LessonScreenState extends State<LessonScreen> {
   final LessonService _lessonService = LessonService();
+  final CoursesService _coursesService = CoursesService();
   List<Lesson> _lessons = [];
   bool _isLoading = true;
   String? _error;
+  Map<int, UserProgress> _progressMap = {};
 
   @override
   void initState() {
@@ -32,6 +38,7 @@ class _LessonScreenState extends State<LessonScreen> {
         _lessons = lessons;
         _isLoading = false;
       });
+      await _loadProgress();
     } catch (e) {
       setState(() {
         _error = e.toString();
@@ -40,20 +47,37 @@ class _LessonScreenState extends State<LessonScreen> {
     }
   }
 
+  Future<void> _loadProgress() async {
+    try {
+      final progresses = await _coursesService.userProgress();
+      setState(() {
+        _progressMap = {for (var p in progresses) p.lessonId: p};
+      });
+    } catch (e) {
+      // Handle error if needed, but since progress is optional, ignore
+    }
+  }
+
+  void _navigateToLesson(Lesson lesson) {
+    Widget lessonScreen;
+
+    if (lesson.isSheetMusicLesson()) {
+      lessonScreen = NoteGuessingScreen(lessonId: lesson.lessonId);
+    } else {
+      lessonScreen = PianoQuestionScreen(lessonId: lesson.lessonId);
+    }
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => lessonScreen),
+    ).then((_) => _loadProgress());
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Colors.grey.shade900,
-              Colors.black,
-              Colors.grey.shade800,
-            ],
-          ),
+          gradient: AppColors.mainBackgroundGradient,
         ),
         child: SafeArea(
           child: Padding(
@@ -138,23 +162,20 @@ class _LessonScreenState extends State<LessonScreen> {
                                       const SizedBox(height: 16),
                                   itemBuilder: (context, index) {
                                     final lesson = _lessons[index];
-                                    final gradientColors =
-                                        _getGradientColors(index);
-
+                                    final gradientColors = _getGradientColors(
+                                        index,
+                                        _progressMap[lesson.lessonId]
+                                            ?.completionPercentage);
                                     return BuildCourseCard(
                                       title: lesson.lessonTitle,
                                       description: lesson.description,
                                       progress: 'Bài ${lesson.lessonOrder}',
                                       gradientColors: gradientColors,
+                                      completionPercentage:
+                                          _progressMap[lesson.lessonId]
+                                              ?.completionPercentage,
                                       onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                PianoQuestionScreen(
-                                                    lessonId: lesson.lessonId),
-                                          ),
-                                        );
+                                        _navigateToLesson(lesson);
                                       },
                                     );
                                   },
@@ -168,13 +189,12 @@ class _LessonScreenState extends State<LessonScreen> {
     );
   }
 
-  List<Color> _getGradientColors(int index) {
-    final colors = [
-      [Colors.grey.shade800, Colors.grey.shade900],
-      [Colors.grey.shade700, Colors.grey.shade900],
-      [Colors.grey.shade800, Colors.black],
-      [Colors.grey.shade600, Colors.grey.shade800],
-    ];
-    return colors[index % colors.length];
+  List<Color> _getGradientColors(int index, int? completionPercentage) {
+    if (completionPercentage == 100) {
+      return AppColors
+          .courseGradients[index % AppColors.courseGradients.length];
+    } else {
+      return [Colors.grey.shade800, Colors.grey.shade900];
+    }
   }
 }

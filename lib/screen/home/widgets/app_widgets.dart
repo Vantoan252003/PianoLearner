@@ -186,7 +186,6 @@ class SectionHeader extends StatelessWidget {
   }
 }
 
-/// Glass Container Widget (Glassmorphism effect)
 class GlassContainer extends StatelessWidget {
   final Widget child;
   final double? width;

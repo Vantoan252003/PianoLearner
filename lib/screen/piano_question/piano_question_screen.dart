@@ -1,15 +1,11 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_piano_pro/note_model.dart';
 import 'package:pianist_vip_pro/screen/main_widget_function/custom_piano.dart';
 import 'package:pianist_vip_pro/screen/main_widget_function/header_game_ui.dart';
-import 'package:pianist_vip_pro/screen/main_widget_function/practice_header.dart';
 import '../../../services/practice_service/get_piano_colors.dart';
 import '../../../services/common_service/soundfont_service.dart';
-import '../../../services/piano_question_service/piano_question_service.dart';
-import '../../services/common_service/piano_detection_service.dart';
-import '../../../models/piano_question_model.dart';
+import '../../services/common_service/piano_game_service.dart';
 
 class PianoQuestionScreen extends StatefulWidget {
   final int lessonId;
@@ -23,32 +19,7 @@ class PianoQuestionScreen extends StatefulWidget {
 
 class _PianoQuestionScreenState extends State<PianoQuestionScreen> {
   final ValueNotifier<Set<int>> pressedKeys = ValueNotifier<Set<int>>({});
-  final List<String> noteNames = [
-    'C',
-    'C#',
-    'D',
-    'D#',
-    'E',
-    'F',
-    'F#',
-    'G',
-    'G#',
-    'A',
-    'A#',
-    'B'
-  ];
-
-  String? currentTargetNote;
-  int? currentTargetMidi;
-  int score = 0;
-  int totalAttempts = 0;
-  bool isAnswered = false;
-  List<PianoQuestion> questions = [];
-  int currentQuestionIndex = 0;
-  bool isLoading = true;
-  final PianoDetectionService _pianoDetectionService = PianoDetectionService();
-  bool _isMicrophoneMode = false;
-  bool _isMicrophoneReady = false;
+  late PianoGameService _gameService;
 
   @override
   void initState() {
@@ -58,8 +29,42 @@ class _PianoQuestionScreenState extends State<PianoQuestionScreen> {
       DeviceOrientation.landscapeRight,
     ]);
     SoundfontService.loadSoundfont();
-    _initializeMicrophone();
-    _loadQuestions();
+
+    _gameService = PianoGameService(widget.lessonId);
+    _gameService.onCorrectDetected = _handleCorrectAnswer;
+    _initializeGame();
+  }
+
+  Future<void> _initializeGame() async {
+    await _gameService.initializeMicrophone();
+    await _gameService.loadQuestions();
+    setState(() {});
+    _gameService.generateNewTarget();
+  }
+
+  void _handleCorrectAnswer() {
+    final isGameFinished =
+        _gameService.handleCorrectAnswer(updateStreak: false);
+    setState(() {});
+
+    if (_gameService.currentTargetMidi != null &&
+        !_gameService.isMicrophoneMode) {
+      SoundfontService.playNote(_gameService.currentTargetMidi!);
+    }
+
+    if (isGameFinished) {
+      _gameService.finishGame(context);
+      return;
+    }
+
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (mounted) {
+        _gameService.nextQuestion();
+        setState(() {
+          pressedKeys.value = {};
+        });
+      }
+    });
   }
 
   @override
@@ -68,131 +73,95 @@ class _PianoQuestionScreenState extends State<PianoQuestionScreen> {
       SoundfontService.stopNote(key);
     });
     SoundfontService.dispose();
-    _pianoDetectionService.dispose();
+    _gameService.dispose();
     pressedKeys.dispose();
     SystemChrome.setPreferredOrientations(DeviceOrientation.values);
-
     super.dispose();
   }
 
-  Future<void> _initializeMicrophone() async {
-    final success = await _pianoDetectionService.initialize();
-    setState(() {
-      _isMicrophoneReady = success;
-    });
-  }
-
-  void _loadQuestions() async {
-    final fetchedQuestions =
-        await PianoQuestionService().fetchPianoQuestions(widget.lessonId);
-    setState(() {
-      questions = fetchedQuestions;
-      isLoading = false;
-    });
-    _generateNewTarget();
-  }
-
-  void _generateNewTarget() {
-    if (questions.isEmpty) return;
-    final currentQuestion = questions[currentQuestionIndex % questions.length];
-    final midiNumbers = currentQuestion.midiNumbers;
-    if (midiNumbers.isNotEmpty) {
-      currentTargetMidi = midiNumbers[Random().nextInt(midiNumbers.length)];
-      currentTargetNote = noteNames[currentTargetMidi! % 12];
-      isAnswered = false;
-      pressedKeys.value = {};
-
-      if (_isMicrophoneMode && _isMicrophoneReady) {
-        _startListening();
-      }
-    }
-  }
-
-  void _startListening() {
-    _pianoDetectionService.startDetection((detectedNotes) {
-      if (isAnswered || !_isMicrophoneMode) return;
-      if (_pianoDetectionService.checkNoteMatch(
-          detectedNotes, currentTargetNote ?? '')) {
-        _handleCorrectAnswer();
-      }
-    });
-  }
-
-  void _stopListening() {
-    _pianoDetectionService.stopDetection();
-  }
-
-  void _handleCorrectAnswer() {
-    if (isAnswered) return;
-
-    setState(() {
-      isAnswered = true;
-      totalAttempts++;
-      score++;
-    });
-
-    if (currentTargetMidi != null && !_isMicrophoneMode) {
-      SoundfontService.playNote(currentTargetMidi!);
-    }
-
-    Future.delayed(const Duration(milliseconds: 100), () {
-      if (mounted) {
-        setState(() {
-          currentQuestionIndex++;
-        });
-        _generateNewTarget();
-      }
-    });
-  }
-
-  void _toggleMode() {
-    setState(() {
-      _isMicrophoneMode = !_isMicrophoneMode;
-    });
-
-    if (_isMicrophoneMode) {
-      if (_isMicrophoneReady) {
-        _startListening();
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Microphone chưa sẵn sàng!')),
-        );
-        setState(() {
-          _isMicrophoneMode = false;
-        });
-      }
-    } else {
-      _stopListening();
-    }
-  }
-
   void _handlePianoTap(NoteModel? note) {
-    if (note == null || isAnswered || _isMicrophoneMode) return;
-    final tappedName = noteNames[note.midiNoteNumber % 12];
-    final targetName = noteNames[currentTargetMidi! % 12];
+    if (note == null ||
+        _gameService.isAnswered ||
+        _gameService.isMicrophoneMode) return;
+
+    final (isCorrect, isGameFinished) = _gameService.handlePianoTap(
+      note.midiNoteNumber,
+      _gameService.currentTargetMidi,
+      updateStreak: false,
+    );
 
     setState(() {
-      isAnswered = true;
-      totalAttempts++;
-      if (tappedName == targetName) score++;
       pressedKeys.value = {note.midiNoteNumber};
     });
 
     SoundfontService.playNote(note.midiNoteNumber);
+
+    if (isGameFinished) {
+      _gameService.finishGame(context);
+      return;
+    }
+
     Future.delayed(const Duration(milliseconds: 100), () {
       if (mounted) {
+        _gameService.nextQuestion();
         setState(() {
-          currentQuestionIndex++;
+          pressedKeys.value = {};
         });
-        _generateNewTarget();
       }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    double correctRate = totalAttempts == 0 ? 0 : (score / totalAttempts) * 100;
     return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          "Nhận diện phím",
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.grey.shade900,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Row(
+              children: [
+                Icon(
+                  _gameService.isMicrophoneMode ? Icons.mic : Icons.touch_app,
+                  color: _gameService.isMicrophoneMode
+                      ? Colors.redAccent
+                      : Colors.blueAccent,
+                  size: 24,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  _gameService.isMicrophoneMode
+                      ? 'Nghe Microphone'
+                      : 'Bấm phím',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Switch(
+                  value: _gameService.isMicrophoneMode,
+                  onChanged: _gameService.isMicrophoneReady
+                      ? (_) => _gameService.toggleMode(
+                          context, (mode) => setState(() {}))
+                      : null,
+                  activeColor: Colors.redAccent,
+                  inactiveThumbColor: Colors.blueAccent,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -204,76 +173,41 @@ class _PianoQuestionScreenState extends State<PianoQuestionScreen> {
         child: SafeArea(
           child: Column(
             children: [
-              AppHeader(
-                  title: "Nhận diện phím",
-                  onBack: () => Navigator.pop(context)),
-
-              // Toggle button cho chế độ
-              Padding(
-                padding: const EdgeInsets.all(0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      _isMicrophoneMode ? Icons.mic : Icons.touch_app,
-                      color: _isMicrophoneMode
-                          ? Colors.redAccent
-                          : Colors.blueAccent,
-                      size: 24,
-                    ),
-                    const SizedBox(width: 12),
-                    Text(
-                      _isMicrophoneMode
-                          ? 'Chế độ: Nghe Microphone'
-                          : 'Chế độ: Bấm phím',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Switch(
-                      value: _isMicrophoneMode,
-                      onChanged:
-                          _isMicrophoneReady ? (_) => _toggleMode() : null,
-                      activeColor: Colors.redAccent,
-                      inactiveThumbColor: Colors.blueAccent,
-                    ),
-                  ],
-                ),
-              ),
-
+              const SizedBox(height: 20),
               Row(
                 children: [
                   Expanded(
-                    child: HeaderGameUi()
-                        .buildStat("🏆 Điểm", '$score', Colors.orangeAccent),
+                    child: HeaderGameUi().buildStat("🏆 Điểm",
+                        '${_gameService.score}', Colors.orangeAccent),
                   ),
                   Expanded(
                     child: Center(
-                      child: HeaderGameUi().buildStat("🎯 Nốt cần chơi",
-                          currentTargetNote ?? "-", Colors.greenAccent),
+                      child: HeaderGameUi().buildStat(
+                          "🎯 Nốt cần chơi",
+                          _gameService.currentTargetNote ?? "-",
+                          Colors.greenAccent),
                     ),
                   ),
                   Expanded(
                     child: HeaderGameUi().buildStat(
-                        "📊 Tỉ lệ đúng",
-                        '${correctRate.toStringAsFixed(0)}%',
+                        "📊 Câu hỏi",
+                        '${_gameService.totalAttempts}/${PianoGameService.maxQuestions}',
                         Colors.blueAccent),
                   ),
                 ],
               ),
               const SizedBox(height: 80),
               Expanded(
-                child: isLoading
-                    ? Center(child: const CircularProgressIndicator())
+                child: _gameService.isLoading
+                    ? const Center(child: CircularProgressIndicator())
                     : ValueListenableBuilder(
                         valueListenable: pressedKeys,
                         builder: (context, _, child) {
                           return CustomPiano(
-                              buttonColors: getPianoColors(currentTargetMidi,
-                                  pressedKeys.value, isAnswered),
+                              buttonColors: getPianoColors(
+                                  _gameService.currentTargetMidi,
+                                  pressedKeys.value,
+                                  _gameService.isAnswered),
                               onNotePressed: _handlePianoTap,
                               noteCount: 20,
                               whiteHeight: 150);

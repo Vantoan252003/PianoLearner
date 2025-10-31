@@ -6,6 +6,7 @@ class BuildCourseCard extends StatelessWidget {
   final String progress;
   final List<Color> gradientColors;
   final VoidCallback? onTap;
+  final int? completionPercentage;
 
   const BuildCourseCard(
       {super.key,
@@ -13,7 +14,8 @@ class BuildCourseCard extends StatelessWidget {
       required this.description,
       required this.progress,
       required this.gradientColors,
-      this.onTap});
+      this.onTap,
+      this.completionPercentage});
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -32,9 +34,9 @@ class BuildCourseCard extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.5),
-              blurRadius: 20,
-              offset: const Offset(0, 10),
+              color: gradientColors[0].withOpacity(0.3),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
             ),
           ],
         ),
@@ -67,8 +69,10 @@ class BuildCourseCard extends StatelessWidget {
                           color: Colors.white.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Icon(
-                          Icons.music_note,
+                        child: Icon(
+                          completionPercentage == 100
+                              ? Icons.check_circle
+                              : Icons.music_note,
                           color: Colors.white,
                           size: 28,
                         ),
@@ -111,6 +115,22 @@ class BuildCourseCard extends StatelessWidget {
                       height: 1.5,
                     ),
                   ),
+                  if (completionPercentage != null) ...[
+                    const SizedBox(height: 12),
+                    LinearProgressIndicator(
+                      value: completionPercentage! / 100.0,
+                      backgroundColor: Colors.white.withOpacity(0.2),
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '$completionPercentage% hoàn thành',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey.shade400,
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
