@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:pianist_vip_pro/screen/home/home_screen.dart';
 import 'package:pianist_vip_pro/auth/auth_process/login_process.dart';
+import 'package:pianist_vip_pro/screen/home/widgets/app_theme.dart' as theme;
 import 'multi_step_register_screen.dart';
+
+typedef AppColors = theme.AppColors;
+typedef AppTextStyles = theme.AppTextStyles;
+typedef AppSpacing = theme.AppSpacing;
+typedef AppRadius = theme.AppRadius;
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -52,10 +58,14 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
+      backgroundColor: AppColors.primaryBlack,
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: AppColors.mainBackgroundGradient,
+        ),
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.all(24.0),
+            padding: const EdgeInsets.all(AppSpacing.lg),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -67,58 +77,54 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: Icon(
                       Icons.piano,
                       size: 80,
+                      color: AppColors.primaryWhite,
                     ),
                   ),
                 ),
                 const SizedBox(height: 24),
-                ShaderMask(
-                  shaderCallback: (bounds) => const LinearGradient(
-                    colors: [
-                      Color(0xFF2C2C2C),
-                      Colors.black,
-                      Color(0xFF4A4A4A),
-                    ],
-                  ).createShader(bounds),
-                  child: const Text(
-                    'Piano Learning',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      letterSpacing: 1.2,
-                    ),
+                const Text(
+                  'Piano Learning',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primaryWhite,
+                    letterSpacing: 1.2,
                   ),
                 ),
                 const SizedBox(height: 8),
-                const Text(
+                Text(
                   'Đăng nhập để tiếp tục',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 16,
-                    color: Colors.grey,
+                    color: Colors.white.withOpacity(0.6),
                   ),
                 ),
                 const SizedBox(height: 48),
                 TextField(
                   controller: _emailController,
                   focusNode: _emailFocus,
+                  style: const TextStyle(color: AppColors.primaryBlack),
                   decoration: InputDecoration(
                     labelText: 'Email',
-                    prefixIcon:
-                        const Icon(Icons.email_outlined, color: Colors.black),
+                    labelStyle: TextStyle(color: Colors.grey.shade600),
+                    prefixIcon: const Icon(Icons.email_outlined,
+                        color: AppColors.primaryBlack),
+                    filled: true,
+                    fillColor: AppColors.primaryWhite,
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Colors.black),
+                      borderRadius: AppRadius.round,
+                      borderSide: BorderSide.none,
                     ),
                     enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Colors.grey),
+                      borderRadius: AppRadius.round,
+                      borderSide: BorderSide.none,
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide:
-                          const BorderSide(color: Colors.black, width: 2),
+                      borderRadius: AppRadius.round,
+                      borderSide: const BorderSide(
+                          color: AppColors.primaryBlack, width: 2),
                     ),
                   ),
                 ),
@@ -128,16 +134,18 @@ class _LoginScreenState extends State<LoginScreen> {
                   controller: _passwordController,
                   focusNode: _passwordFocus,
                   obscureText: _obscurePassword,
+                  style: const TextStyle(color: AppColors.primaryBlack),
                   decoration: InputDecoration(
                     labelText: 'Mật khẩu',
-                    prefixIcon:
-                        const Icon(Icons.lock_outline, color: Colors.black),
+                    labelStyle: TextStyle(color: Colors.grey.shade600),
+                    prefixIcon: const Icon(Icons.lock_outline,
+                        color: AppColors.primaryBlack),
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscurePassword
                             ? Icons.visibility_off
                             : Icons.visibility,
-                        color: Colors.black,
+                        color: AppColors.primaryBlack,
                       ),
                       onPressed: () {
                         setState(() {
@@ -145,18 +153,20 @@ class _LoginScreenState extends State<LoginScreen> {
                         });
                       },
                     ),
+                    filled: true,
+                    fillColor: AppColors.primaryWhite,
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Colors.black),
+                      borderRadius: AppRadius.round,
+                      borderSide: BorderSide.none,
                     ),
                     enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Colors.grey),
+                      borderRadius: AppRadius.round,
+                      borderSide: BorderSide.none,
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide:
-                          const BorderSide(color: Colors.black, width: 2),
+                      borderRadius: AppRadius.round,
+                      borderSide: const BorderSide(
+                          color: AppColors.primaryBlack, width: 2),
                     ),
                   ),
                 ),
@@ -168,9 +178,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     onPressed: () {
                       // TODO: Xử lý quên mật khẩu
                     },
-                    child: const Text(
+                    child: Text(
                       'Quên mật khẩu?',
-                      style: TextStyle(color: Colors.grey),
+                      style: TextStyle(color: Colors.white.withOpacity(0.6)),
                     ),
                   ),
                 ),
@@ -178,66 +188,82 @@ class _LoginScreenState extends State<LoginScreen> {
                 // Nút đăng nhập với gradient
                 Container(
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(
+                    gradient: LinearGradient(
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        Color(0xFF2C2C2C),
-                        Colors.black,
-                        Color(0xFF1A1A1A),
+                        AppColors.coursesBlue,
+                        AppColors.coursesBlueDark,
                       ],
                     ),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: AppRadius.round,
                     boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.3),
-                        blurRadius: 15,
-                        offset: const Offset(0, 8),
-                      ),
+                      AppColors.cardShadow(color: AppColors.coursesBlue),
                     ],
                   ),
                   child: ElevatedButton(
                     onPressed: _isLoading ? null : doLogin,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.transparent,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      foregroundColor: AppColors.primaryWhite,
+                      padding:
+                          const EdgeInsets.symmetric(vertical: AppSpacing.lg),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: AppRadius.round,
                       ),
                       elevation: 0,
                       shadowColor: Colors.transparent,
                     ),
-                    child: const Text(
-                      'Đăng nhập',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    child: _isLoading
+                        ? const SizedBox(
+                            height: 24,
+                            width: 24,
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                  AppColors.primaryWhite),
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : const Text(
+                            'Đăng nhập',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                   ),
                 ),
                 const SizedBox(height: 24),
                 // Divider
-                const Row(
+                Row(
                   children: [
-                    Expanded(child: Divider(color: Colors.grey)),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16),
-                      child: Text('hoặc', style: TextStyle(color: Colors.grey)),
+                    Expanded(
+                      child: Divider(
+                        color: Colors.white.withOpacity(0.2),
+                      ),
                     ),
-                    Expanded(child: Divider(color: Colors.grey)),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Text(
+                        'hoặc',
+                        style: TextStyle(color: Colors.white.withOpacity(0.6)),
+                      ),
+                    ),
+                    Expanded(
+                      child: Divider(
+                        color: Colors.white.withOpacity(0.2),
+                      ),
+                    ),
                   ],
                 ),
-
                 const SizedBox(height: 32),
                 // Chuyển sang đăng ký
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(
+                    Text(
                       'Chưa có tài khoản? ',
-                      style: TextStyle(color: Colors.grey),
+                      style: TextStyle(color: Colors.white.withOpacity(0.6)),
                     ),
                     TextButton(
                       onPressed: () {
@@ -252,7 +278,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: const Text(
                         'Đăng ký',
                         style: TextStyle(
-                          color: Colors.black,
+                          color: AppColors.primaryWhite,
                           fontWeight: FontWeight.bold,
                         ),
                       ),

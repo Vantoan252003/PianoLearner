@@ -1,15 +1,21 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 class PracticeStats extends StatelessWidget {
   final int lessonsCompleted;
   final int totalPracticeMinutes;
   final int achievementsUnlocked;
+  final int streakDays;
+  final double completionPercentage;
 
   const PracticeStats({
     Key? key,
     this.lessonsCompleted = 0,
     this.totalPracticeMinutes = 0,
     this.achievementsUnlocked = 0,
+    this.streakDays = 0,
+    this.completionPercentage = 0.0,
   }) : super(key: key);
 
   @override
@@ -43,8 +49,10 @@ class PracticeStats extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+          Wrap(
+            spacing: 62,
+            runSpacing: 16,
+            alignment: WrapAlignment.center,
             children: [
               _StatItem(
                 icon: Icons.check_circle_outline,
@@ -52,27 +60,23 @@ class PracticeStats extends StatelessWidget {
                 label: 'Bài học',
                 color: Colors.green,
               ),
-              Container(
-                width: 1,
-                height: 40,
-                color: Colors.white.withOpacity(0.1),
-              ),
               _StatItem(
                 icon: Icons.timer_outlined,
                 value: totalPracticeMinutes.toString(),
                 label: 'Phút',
                 color: Colors.blue,
               ),
-              Container(
-                width: 1,
-                height: 40,
-                color: Colors.white.withOpacity(0.1),
-              ),
               _StatItem(
                 icon: Icons.emoji_events_outlined,
                 value: achievementsUnlocked.toString(),
                 label: 'Huy hiệu',
                 color: Colors.amber,
+              ),
+              _StatItem(
+                icon: Icons.local_fire_department,
+                value: streakDays.toString(),
+                label: 'Streak',
+                color: Colors.deepOrange,
               ),
             ],
           ),

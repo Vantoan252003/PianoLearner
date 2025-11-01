@@ -1,8 +1,6 @@
 import 'package:pianist_vip_pro/services/auth_service/auth_service.dart';
 import 'package:pianist_vip_pro/models/user_model.dart';
 
-/// Thực hiện validate đơn giản rồi gọi AuthService.register.
-/// Ném Exception với message thân thiện khi có lỗi.
 Future<User> registerProcess({
   required String fullName,
   required String email,

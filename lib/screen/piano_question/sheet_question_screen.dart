@@ -205,7 +205,7 @@ class _NoteGuessingScreenState extends State<NoteGuessingScreen> {
                               'Combo', '${_gameService.streak}', Colors.orange),
                           HeaderGameUi().buildStat(
                             'Câu hỏi',
-                            '${_gameService.totalAttempts}/${PianoGameService.maxQuestions}',
+                            '${_gameService.totalAttempts}/${_gameService.maxQuestions}',
                             Colors.purple,
                           ),
                         ],

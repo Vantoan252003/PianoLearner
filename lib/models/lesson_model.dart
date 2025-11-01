@@ -45,6 +45,8 @@ class Lesson {
     // Lessons 3+: sheet music reading
     if (lessonId <= 2) {
       return 'piano_key';
+    } else if (lessonId >= 5) {
+      return 'chord_lesson';
     } else {
       return 'sheet_music';
     }
@@ -53,4 +55,5 @@ class Lesson {
   /// Check if this is a piano key recognition lesson
   bool isPianoKeyLesson() => getLessonType() == 'piano_key';
   bool isSheetMusicLesson() => getLessonType() == 'sheet_music';
+  bool isChordMusicLesson() => getLessonType() == 'chord_lesson';
 }

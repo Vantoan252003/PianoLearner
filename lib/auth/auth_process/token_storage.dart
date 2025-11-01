@@ -44,7 +44,6 @@ class TokenStorage {
     final prefs = await SharedPreferences.getInstance();
     final userJson = jsonEncode(user.toJson());
     await prefs.setString(_userData, userJson);
-    // Also save basic info for backward compatibility
     await prefs.setString(_userFullName, user.fullName);
     await prefs.setString(_userEmail, user.email);
   }

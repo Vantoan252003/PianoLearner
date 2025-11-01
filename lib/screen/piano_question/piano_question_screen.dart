@@ -191,7 +191,7 @@ class _PianoQuestionScreenState extends State<PianoQuestionScreen> {
                   Expanded(
                     child: HeaderGameUi().buildStat(
                         "📊 Câu hỏi",
-                        '${_gameService.totalAttempts}/${PianoGameService.maxQuestions}',
+                        '${_gameService.totalAttempts}/${_gameService.maxQuestions}',
                         Colors.blueAccent),
                   ),
                 ],

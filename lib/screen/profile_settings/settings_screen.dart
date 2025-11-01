@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:pianist_vip_pro/auth/auth_process/token_storage.dart';
+import 'package:pianist_vip_pro/models/user_model.dart';
 import 'package:pianist_vip_pro/screen/auth_screen/login_screen.dart';
+import 'package:pianist_vip_pro/screen/user/user_detail_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -13,7 +15,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   String _fullName = '';
   String _email = '';
   bool _isLoading = true;
-
+  User? _user;
   @override
   void initState() {
     super.initState();
@@ -23,11 +25,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _loadUserInfo() async {
     final fullName = await TokenStorage.getUserFullName();
     final email = await TokenStorage.getUserEmail();
+    final userInfo = await TokenStorage.getUser();
 
     setState(() {
       _fullName = fullName ?? 'Người dùng';
       _email = email ?? '';
       _isLoading = false;
+      _user = userInfo;
     });
   }
 
@@ -58,7 +62,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       // Xóa token và thông tin user
       await TokenStorage.clearToken();
 
-      // Quay về màn hình login và xóa tất cả màn hình trước đó
       if (context.mounted) {
         Navigator.pushAndRemoveUntil(
           context,
@@ -170,7 +173,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               size: 16,
                             ),
                             onTap: () {
-                              // TODO: Chuyển đến màn hình thông tin cá nhân
+                              if (_user != null) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        UserDetailScreen(user: _user!),
+                                  ),
+                                );
+                              }
                             },
                           ),
                           const Divider(color: Colors.white24),

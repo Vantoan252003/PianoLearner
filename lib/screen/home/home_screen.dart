@@ -5,6 +5,7 @@ import 'package:pianist_vip_pro/screen/practice/practice_screen.dart';
 import 'package:pianist_vip_pro/screen/profile_settings/settings_screen.dart';
 import 'package:pianist_vip_pro/screen/achievements/achievements_screen.dart';
 import 'package:pianist_vip_pro/services/courses_service/courses_service.dart';
+import 'package:pianist_vip_pro/services/auth_service/auth_service.dart';
 import 'package:pianist_vip_pro/models/courses_model.dart';
 import 'package:pianist_vip_pro/models/user_model.dart';
 import 'package:pianist_vip_pro/screen/home/widgets/user_header.dart';
@@ -22,6 +23,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final CoursesService _coursesService = CoursesService();
+  final AuthService _authService = AuthService();
 
   List<Courses> _courses = [];
 
@@ -31,10 +33,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   String? _coursesError;
 
-  int _lessonsCompleted = 12;
-  int _totalPracticeMinutes = 450;
-  int _achievementsUnlocked = 5;
-
   @override
   void initState() {
     super.initState();
@@ -43,16 +41,27 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _loadUserData() async {
-    // Load user from storage
+    // Load user from API
     try {
-      final user = await TokenStorage.getUser();
-      if (user != null) {
+      final user = await _authService.getUserInfo();
+      if (mounted) {
         setState(() {
           _user = user;
         });
       }
     } catch (e) {
       print('Error loading user: $e');
+      // Fallback to cached user data
+      try {
+        final cachedUser = await TokenStorage.getUser();
+        if (mounted && cachedUser != null) {
+          setState(() {
+            _user = cachedUser;
+          });
+        }
+      } catch (e2) {
+        print('Error loading cached user: $e2');
+      }
     }
   }
 
@@ -139,7 +148,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                     const AchievementsScreen()));
                       },
                       onSongTap: () {
-                        // TODO: Navigate to songs screen
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text('Tính năng bài hát đang phát triển'),
@@ -166,11 +174,24 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(height: 20),
 
                     // Practice Statistics
-                    PracticeStats(
-                      lessonsCompleted: _lessonsCompleted,
-                      totalPracticeMinutes: _totalPracticeMinutes,
-                      achievementsUnlocked: _achievementsUnlocked,
-                    ),
+                    if (_user != null)
+                      PracticeStats(
+                        lessonsCompleted: _user!.totalLessonsCompleted,
+                        totalPracticeMinutes: _user!.totalLearningTimeMinutes,
+                        achievementsUnlocked: _user!.totalAchievementsUnlocked,
+                        streakDays: _user!.streakDays,
+                        completionPercentage:
+                            _user!.averageCompletionPercentage,
+                      )
+                    else
+                      const PracticeStats(
+                        lessonsCompleted: 4,
+                        totalPracticeMinutes: 4,
+                        achievementsUnlocked: 0,
+                        streakDays: 0,
+                        completionPercentage: 0.0,
+                      ),
+
                     const SizedBox(height: 24),
 
                     // Courses Section
@@ -196,7 +217,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         );
                       },
                     ),
-                    const SizedBox(height: 20),
                   ],
                 ),
               ),

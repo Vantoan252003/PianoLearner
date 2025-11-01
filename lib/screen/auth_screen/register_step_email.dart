@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pianist_vip_pro/providers/register_provider.dart';
+import 'package:pianist_vip_pro/screen/home/widgets/app_theme.dart' as theme;
+import 'package:pianist_vip_pro/services/auth_service/auth_service.dart';
+
+typedef AppColors = theme.AppColors;
+typedef AppSpacing = theme.AppSpacing;
+typedef AppRadius = theme.AppRadius;
 
 class RegisterStepEmail extends StatefulWidget {
   final Function() onNext;
@@ -19,6 +25,7 @@ class RegisterStepEmail extends StatefulWidget {
 class _RegisterStepEmailState extends State<RegisterStepEmail> {
   late TextEditingController _emailController;
   final FocusNode _emailFocus = FocusNode();
+  String? _emailErrorMessage;
 
   @override
   void initState() {
@@ -40,6 +47,39 @@ class _RegisterStepEmailState extends State<RegisterStepEmail> {
         .hasMatch(email);
   }
 
+  Future<void> _checkEmailAvailability(String email) async {
+    if (!_isValidEmail(email)) {
+      return;
+    }
+
+    setState(() {
+      _emailErrorMessage = null;
+    });
+
+    try {
+      final authService = AuthService();
+      final message = await authService.checkEmailAvailability(email);
+
+      if (mounted) {
+        if (message != null && message.isNotEmpty) {
+          setState(() {
+            _emailErrorMessage = message;
+          });
+        } else {
+          setState(() {
+            _emailErrorMessage = null;
+          });
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _emailErrorMessage = 'Lỗi kiểm tra email: ${e.toString()}';
+        });
+      }
+    }
+  }
+
   void _handleNext() {
     if (_emailController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -55,135 +95,177 @@ class _RegisterStepEmailState extends State<RegisterStepEmail> {
       return;
     }
 
+    if (_emailErrorMessage != null && _emailErrorMessage!.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(_emailErrorMessage!)),
+      );
+      return;
+    }
+
     context.read<RegisterProvider>().setEmail(_emailController.text);
     widget.onNext();
   }
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const SizedBox(height: 40),
-            // Tiêu đề
-            const Text(
-              'Email của bạn?',
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-                letterSpacing: 0.5,
-              ),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'Bước 2/4',
-              style: TextStyle(
-                fontSize: 14,
-                color: Color(0xFF999999),
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const SizedBox(height: 40),
-            // Input Email
-            TextField(
-              controller: _emailController,
-              focusNode: _emailFocus,
-              keyboardType: TextInputType.emailAddress,
-              decoration: InputDecoration(
-                hintText: 'Nhập email của bạn',
-                hintStyle: const TextStyle(color: Color(0xFFBBBBBB)),
-                filled: true,
-                fillColor: const Color(0xFFF5F5F5),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(
-                    color: Colors.black,
-                    width: 2,
-                  ),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 18,
-                ),
-              ),
-              style: const TextStyle(
-                fontSize: 16,
-                color: Colors.black,
-              ),
-              onChanged: (value) {
-                setState(() {});
-              },
-            ),
-            const SizedBox(height: 60),
-            // Nút Next
-            SizedBox(
-              height: 56,
-              child: ElevatedButton(
-                onPressed:
-                    _emailController.text.isNotEmpty ? _handleNext : null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: _emailController.text.isNotEmpty
-                      ? Colors.black
-                      : Colors.grey.shade300,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  elevation: 0,
-                ),
-                child: Text(
-                  'Tiếp theo',
+    return Scaffold(
+      backgroundColor: AppColors.primaryBlack,
+      appBar: AppBar(
+        backgroundColor: AppColors.primaryBlack,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: AppColors.primaryWhite),
+          onPressed: widget.onPrevious,
+        ),
+        centerTitle: false,
+      ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: AppColors.mainBackgroundGradient,
+        ),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(height: 20),
+                // Tiêu đề
+                const Text(
+                  'Email của bạn?',
                   style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: _emailController.text.isNotEmpty
-                        ? Colors.white
-                        : Colors.grey.shade600,
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primaryWhite,
                     letterSpacing: 0.5,
                   ),
                 ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            // Nút Previous
-            SizedBox(
-              height: 56,
-              child: ElevatedButton(
-                onPressed: widget.onPrevious,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  side: const BorderSide(
-                    color: Colors.black,
-                    width: 1,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  elevation: 0,
-                ),
-                child: const Text(
-                  'Quay lại',
+                const SizedBox(height: 8),
+                Text(
+                  'Bước 2/4',
                   style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black,
-                    letterSpacing: 0.5,
+                    fontSize: 14,
+                    color: Colors.white.withOpacity(0.6),
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
-              ),
+                const SizedBox(height: 40),
+                // Input Email
+                TextField(
+                  controller: _emailController,
+                  focusNode: _emailFocus,
+                  keyboardType: TextInputType.emailAddress,
+                  style: const TextStyle(color: AppColors.primaryBlack),
+                  decoration: InputDecoration(
+                    hintText: 'Nhập email của bạn',
+                    hintStyle: TextStyle(color: Colors.grey.shade400),
+                    filled: true,
+                    fillColor: AppColors.primaryWhite,
+                    border: OutlineInputBorder(
+                      borderRadius: AppRadius.round,
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: AppRadius.round,
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: AppRadius.round,
+                      borderSide: const BorderSide(
+                        color: AppColors.primaryBlack,
+                        width: 2,
+                      ),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.lg,
+                      vertical: 18,
+                    ),
+                  ),
+                  onChanged: (value) {
+                    if (value.isNotEmpty && _isValidEmail(value)) {
+                      _checkEmailAvailability(value);
+                    } else {
+                      setState(() {
+                        _emailErrorMessage = null;
+                      });
+                    }
+                  },
+                ),
+                if (_emailErrorMessage != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: AppSpacing.sm),
+                    child: Text(
+                      _emailErrorMessage!,
+                      style: TextStyle(
+                        color: AppColors.errorRed,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                const SizedBox(height: 60),
+                // Nút Next
+                SizedBox(
+                  height: 56,
+                  child: ElevatedButton(
+                    onPressed: _emailController.text.isNotEmpty &&
+                            _emailErrorMessage == null
+                        ? _handleNext
+                        : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _emailController.text.isNotEmpty &&
+                              _emailErrorMessage == null
+                          ? AppColors.songsPurple
+                          : Colors.grey.shade600,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: AppRadius.round,
+                      ),
+                      elevation: 0,
+                    ),
+                    child: Text(
+                      'Tiếp theo',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: _emailController.text.isNotEmpty &&
+                                _emailErrorMessage == null
+                            ? AppColors.primaryWhite
+                            : Colors.white.withOpacity(0.6),
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                // Nút Previous
+                SizedBox(
+                  height: 56,
+                  child: ElevatedButton(
+                    onPressed: widget.onPrevious,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primaryWhite,
+                      side: const BorderSide(
+                        color: AppColors.primaryBlack,
+                        width: 1,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: AppRadius.round,
+                      ),
+                      elevation: 0,
+                    ),
+                    child: const Text(
+                      'Quay lại',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primaryBlack,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

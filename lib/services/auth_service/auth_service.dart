@@ -78,4 +78,57 @@ class AuthService {
           "Register failed: ${response.statusCode} ${response.body}");
     }
   }
+
+  /// Kiểm tra email đã được sử dụng hay chưa
+  /// Trả về message nếu email đã tồn tại, null nếu email OK
+  Future<String?> checkEmailAvailability(String email) async {
+    try {
+      final url = Uri.parse(
+        '${ApiEndpoint.baseUrl}${ApiEndpoint.checkmail}?email=$email',
+      );
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
+        final message = data['message'] as String?;
+        return message;
+      } else {
+        throw Exception('Error checking email: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Failed to check email: ${e.toString()}');
+    }
+  }
+
+  /// Fetch user info từ server
+  Future<User> getUserInfo() async {
+    try {
+      final token = await TokenStorage.getToken();
+      if (token == null) {
+        throw Exception('No token found');
+      }
+
+      final url = Uri.parse('${ApiEndpoint.baseUrl}${ApiEndpoint.userInfo}');
+      final response = await http.get(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
+        final userObj = User.fromJson(data);
+        await TokenStorage.saveUser(userObj);
+
+        return userObj;
+      } else {
+        throw Exception(
+            'Failed to fetch user info: ${response.statusCode} ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('Error fetching user info: ${e.toString()}');
+    }
+  }
 }

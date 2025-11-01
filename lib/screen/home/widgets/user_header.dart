@@ -51,14 +51,14 @@ class UserHeader extends StatelessWidget {
                     child: Image.network(
                       user!.avatarUrl!,
                       fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Icon(
+                      errorBuilder: (context, error, stackTrace) => const Icon(
                         Icons.person,
                         color: Colors.white,
                         size: 30,
                       ),
                     ),
                   )
-                : Icon(
+                : const Icon(
                     Icons.person,
                     color: Colors.white,
                     size: 30,
@@ -100,7 +100,7 @@ class UserHeader extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    Icon(
+                    const Icon(
                       Icons.stars,
                       color: Colors.amber,
                       size: 16,

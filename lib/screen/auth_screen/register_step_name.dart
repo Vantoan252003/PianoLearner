@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pianist_vip_pro/providers/register_provider.dart';
+import 'package:pianist_vip_pro/screen/home/widgets/app_theme.dart' as theme;
+
+typedef AppColors = theme.AppColors;
+typedef AppSpacing = theme.AppSpacing;
+typedef AppRadius = theme.AppRadius;
 
 class RegisterStepName extends StatefulWidget {
   final Function() onNext;
@@ -54,99 +59,111 @@ class _RegisterStepNameState extends State<RegisterStepName> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const SizedBox(height: 40),
-            // Tiêu đề
-            const Text(
-              'Tên của bạn?',
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-                letterSpacing: 0.5,
-              ),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'Bước 1/4',
-              style: TextStyle(
-                fontSize: 14,
-                color: Color(0xFF999999),
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const SizedBox(height: 40),
-            // Input Name
-            TextField(
-              controller: _nameController,
-              focusNode: _nameFocus,
-              decoration: InputDecoration(
-                hintText: 'Nhập tên đầy đủ',
-                hintStyle: const TextStyle(color: Color(0xFFBBBBBB)),
-                filled: true,
-                fillColor: const Color(0xFFF5F5F5),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(
-                    color: Colors.black,
-                    width: 2,
-                  ),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 18,
-                ),
-              ),
-              style: const TextStyle(
-                fontSize: 16,
-                color: Colors.black,
-              ),
-              onChanged: (value) {
-                setState(() {});
-              },
-            ),
-            const SizedBox(height: 60),
-            // Nút Next
-            SizedBox(
-              height: 56,
-              child: ElevatedButton(
-                onPressed: _nameController.text.isNotEmpty ? _handleNext : null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: _nameController.text.isNotEmpty
-                      ? Colors.black
-                      : Colors.grey.shade300,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  elevation: 0,
-                ),
-                child: Text(
-                  'Tiếp theo',
+    return Scaffold(
+      backgroundColor: AppColors.primaryBlack,
+      appBar: AppBar(
+        backgroundColor: AppColors.primaryBlack,
+        elevation: 0,
+        leading: const SizedBox.shrink(),
+        centerTitle: false,
+      ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: AppColors.mainBackgroundGradient,
+        ),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(height: 20),
+                // Tiêu đề
+                const Text(
+                  'Tên của bạn?',
                   style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: _nameController.text.isNotEmpty
-                        ? Colors.white
-                        : Colors.grey.shade600,
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primaryWhite,
                     letterSpacing: 0.5,
                   ),
                 ),
-              ),
+                const SizedBox(height: 8),
+                Text(
+                  'Bước 1/4',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.white.withOpacity(0.6),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 40),
+                // Input Name
+                TextField(
+                  controller: _nameController,
+                  focusNode: _nameFocus,
+                  style: const TextStyle(color: AppColors.primaryBlack),
+                  decoration: InputDecoration(
+                    hintText: 'Nhập tên đầy đủ',
+                    hintStyle: TextStyle(color: Colors.grey.shade400),
+                    filled: true,
+                    fillColor: AppColors.primaryWhite,
+                    border: OutlineInputBorder(
+                      borderRadius: AppRadius.round,
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: AppRadius.round,
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: AppRadius.round,
+                      borderSide: const BorderSide(
+                        color: AppColors.primaryBlack,
+                        width: 2,
+                      ),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.lg,
+                      vertical: 18,
+                    ),
+                  ),
+                  onChanged: (value) {
+                    setState(() {});
+                  },
+                ),
+                const SizedBox(height: 60),
+                // Nút Next
+                SizedBox(
+                  height: 56,
+                  child: ElevatedButton(
+                    onPressed:
+                        _nameController.text.isNotEmpty ? _handleNext : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _nameController.text.isNotEmpty
+                          ? AppColors.coursesBlue
+                          : Colors.grey.shade600,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: AppRadius.round,
+                      ),
+                      elevation: 0,
+                    ),
+                    child: Text(
+                      'Tiếp theo',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: _nameController.text.isNotEmpty
+                            ? AppColors.primaryWhite
+                            : Colors.white.withOpacity(0.6),
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

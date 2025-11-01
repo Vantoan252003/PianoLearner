@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pianist_vip_pro/screen/courses/course_screen.dart';
+import 'package:pianist_vip_pro/screen/piano_question/chord_question_screen.dart';
 import 'package:pianist_vip_pro/services/lesson_service/lesson_service.dart';
 import 'package:pianist_vip_pro/models/lesson_model.dart';
 import 'package:pianist_vip_pro/screen/piano_question/piano_question_screen.dart';
@@ -63,6 +64,8 @@ class _LessonScreenState extends State<LessonScreen> {
 
     if (lesson.isSheetMusicLesson()) {
       lessonScreen = NoteGuessingScreen(lessonId: lesson.lessonId);
+    } else if (lesson.isChordMusicLesson()) {
+      lessonScreen = ChordQuestionScreenV2(lessonId: lesson.lessonId);
     } else {
       lessonScreen = PianoQuestionScreen(lessonId: lesson.lessonId);
     }
