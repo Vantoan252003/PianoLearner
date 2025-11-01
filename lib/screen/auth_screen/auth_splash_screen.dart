@@ -81,24 +81,14 @@ class _AuthSplashScreenState extends State<AuthSplashScreen> {
                         color: AppColors.primaryWhite,
                       ),
                     ),
-                    const SizedBox(height: 40),
-                    ShaderMask(
-                      shaderCallback: (bounds) => LinearGradient(
-                        colors: [
-                          AppColors.primaryGrey700,
-                          AppColors.primaryBlack,
-                          AppColors.primaryGrey700,
-                        ],
-                      ).createShader(bounds),
-                      child: const Text(
-                        'Piano Learning',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 36,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primaryWhite,
-                          letterSpacing: 1.5,
-                        ),
+                    const Text(
+                      'Piano Learning',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 36,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primaryWhite,
+                        letterSpacing: 1.5,
                       ),
                     ),
                     const SizedBox(height: 16),

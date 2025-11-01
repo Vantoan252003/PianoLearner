@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 
 class QuickActions extends StatelessWidget {
   final VoidCallback onAchievementTap;
-  final VoidCallback onSongTap;
+  final VoidCallback onRankingTap;
   final VoidCallback onTutorTap;
   final VoidCallback onPracticeTap;
 
   const QuickActions({
     Key? key,
     required this.onAchievementTap,
-    required this.onSongTap,
+    required this.onRankingTap,
     required this.onTutorTap,
     required this.onPracticeTap,
   }) : super(key: key);
@@ -41,9 +41,9 @@ class QuickActions extends StatelessWidget {
             const SizedBox(width: 12),
             Expanded(
               child: _QuickActionButton(
-                icon: Icons.music_note,
-                label: 'Bài hát',
-                onTap: onSongTap,
+                icon: Icons.emoji_events,
+                label: 'Xếp hạng',
+                onTap: onRankingTap,
                 gradientColors: [
                   Colors.purple.shade700,
                   Colors.purple.shade900

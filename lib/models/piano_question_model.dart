@@ -3,8 +3,7 @@ class PianoQuestion {
   final List<int> midiNumbers;
   final String difficulty;
   final int questionCount;
-  final List<List<int>>?
-      chord; // Mảng các hợp âm, mỗi hợp âm là mảng MIDI numbers
+  final List<List<int>>? chord;
 
   PianoQuestion(
       {required this.lessonId,

@@ -4,6 +4,7 @@ import 'package:pianist_vip_pro/screen/main_note_screen/note_detection_test_scre
 import 'package:pianist_vip_pro/screen/practice/practice_screen.dart';
 import 'package:pianist_vip_pro/screen/profile_settings/settings_screen.dart';
 import 'package:pianist_vip_pro/screen/achievements/achievements_screen.dart';
+import 'package:pianist_vip_pro/screen/ranking/ranking_screen.dart';
 import 'package:pianist_vip_pro/services/courses_service/courses_service.dart';
 import 'package:pianist_vip_pro/services/auth_service/auth_service.dart';
 import 'package:pianist_vip_pro/models/courses_model.dart';
@@ -147,10 +148,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                 builder: (context) =>
                                     const AchievementsScreen()));
                       },
-                      onSongTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Tính năng bài hát đang phát triển'),
+                      onRankingTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const RankingScreen(),
                           ),
                         );
                       },

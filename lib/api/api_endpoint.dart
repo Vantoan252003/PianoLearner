@@ -13,4 +13,7 @@ class ApiEndpoint {
 
   //user
   static const String userInfo = '/auth/user-info';
+
+  //ranking
+  static const String ranking = '/auth/ranking';
 }
