@@ -142,11 +142,9 @@ class ChordTranslatorService {
       return 'Minor 6';
     }
 
-    // Nếu không khớp với bất kỳ pattern nào
     return 'Unknown';
   }
 
-  /// Phiên bản tiếng Việt của tên hợp âm
   static String translateChordVietnamese(List<int> midiNumbers) {
     String englishName = translateChord(midiNumbers);
     return _toVietnamese(englishName);

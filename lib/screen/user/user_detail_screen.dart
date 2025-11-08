@@ -1,17 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:pianist_vip_pro/models/user_model.dart';
 import 'package:pianist_vip_pro/screen/home/widgets/app_theme.dart' as theme;
+import 'package:pianist_vip_pro/screen/user/change_password_screen.dart';
 
 typedef AppColors = theme.AppColors;
 typedef AppSpacing = theme.AppSpacing;
 typedef AppRadius = theme.AppRadius;
 typedef AppTextStyles = theme.AppTextStyles;
 
-class UserDetailScreen extends StatelessWidget {
+class UserDetailScreen extends StatefulWidget {
   final User user;
 
   const UserDetailScreen({Key? key, required this.user}) : super(key: key);
 
+  @override
+  State<UserDetailScreen> createState() => _UserDetailScreenState();
+}
+
+class _UserDetailScreenState extends State<UserDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,16 +61,16 @@ class UserDetailScreen extends StatelessWidget {
                         ],
                       ),
                     ),
-                    child: user.avatarUrl != null
+                    child: widget.user.avatarUrl != null
                         ? ClipOval(
                             child: Image.network(
-                              user.avatarUrl!,
+                              widget.user.avatarUrl!,
                               fit: BoxFit.cover,
                             ),
                           )
                         : Center(
                             child: Text(
-                              user.fullName[0].toUpperCase(),
+                              widget.user.fullName[0].toUpperCase(),
                               style: const TextStyle(
                                 fontSize: 48,
                                 fontWeight: FontWeight.bold,
@@ -81,7 +87,7 @@ class UserDetailScreen extends StatelessWidget {
                   child: Column(
                     children: [
                       Text(
-                        user.fullName,
+                        widget.user.fullName,
                         style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -90,7 +96,7 @@ class UserDetailScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        user.email,
+                        widget.user.email,
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.white.withOpacity(0.6),
@@ -107,7 +113,7 @@ class UserDetailScreen extends StatelessWidget {
                           borderRadius: AppRadius.round,
                         ),
                         child: Text(
-                          user.levelName,
+                          widget.user.levelName,
                           style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
@@ -119,7 +125,49 @@ class UserDetailScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 40),
-
+                _buildSectionTitle('Chi tiết tài khoản'),
+                const SizedBox(height: 16),
+                _buildInfoCard(
+                  icon: Icons.email,
+                  label: 'Email',
+                  value: widget.user.email,
+                ),
+                const SizedBox(height: 12),
+                _buildInfoCard(
+                  icon: Icons.person,
+                  label: 'Họ và tên',
+                  value: widget.user.fullName,
+                ),
+                const SizedBox(height: 12),
+                _buildInfoCard(
+                  icon: Icons.calendar_today,
+                  label: 'Ngày tạo tài khoản',
+                  value: _formatDate(widget.user.createdAt),
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ChangePasswordScreen(),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.coursesBlue,
+                    foregroundColor: AppColors.primaryWhite,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.lg,
+                      vertical: AppSpacing.md,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: AppRadius.round,
+                    ),
+                  ),
+                  child: const Text('Đổi thông tin cá nhân'),
+                ),
+                const SizedBox(height: 40),
                 // Statistics Section
                 _buildSectionTitle('Thống kê học tập'),
                 const SizedBox(height: 16),
@@ -127,14 +175,14 @@ class UserDetailScreen extends StatelessWidget {
                   icon: Icons.school,
                   label: 'Bài học hoàn thành',
                   value:
-                      '${user.totalLessonsCompleted}/${user.totalLessonsTaken}',
+                      '${widget.user.totalLessonsCompleted}/${widget.user.totalLessonsTaken}',
                   color: AppColors.coursesBlue,
                 ),
                 const SizedBox(height: 12),
                 _buildStatRow(
                   icon: Icons.timer,
                   label: 'Thời gian học',
-                  value: '${user.totalLearningTimeMinutes} phút',
+                  value: '${widget.user.totalLearningTimeMinutes} phút',
                   color: AppColors.songsPurple,
                 ),
                 const SizedBox(height: 12),
@@ -142,21 +190,21 @@ class UserDetailScreen extends StatelessWidget {
                   icon: Icons.percent,
                   label: 'Tỉ lệ hoàn thành',
                   value:
-                      '${user.averageCompletionPercentage.toStringAsFixed(1)}%',
+                      '${widget.user.averageCompletionPercentage.toStringAsFixed(1)}%',
                   color: AppColors.tutorGreen,
                 ),
                 const SizedBox(height: 12),
                 _buildStatRow(
                   icon: Icons.local_fire_department,
                   label: 'Streak hôm nay',
-                  value: '${user.streakDays} ngày',
+                  value: '${widget.user.streakDays} ngày',
                   color: AppColors.practiceOrange,
                 ),
                 const SizedBox(height: 12),
                 _buildStatRow(
                   icon: Icons.star,
                   label: 'Thành tích mở khóa',
-                  value: '${user.totalAchievementsUnlocked}',
+                  value: '${widget.user.totalAchievementsUnlocked}',
                   color: AppColors.achievementGold,
                 ),
 
@@ -167,29 +215,19 @@ class UserDetailScreen extends StatelessWidget {
                 const SizedBox(height: 16),
                 _buildExperienceCard(),
 
-                const SizedBox(height: 40),
-
-                // Account Info Section
-                _buildSectionTitle('Thông tin tài khoản'),
-                const SizedBox(height: 16),
-                _buildInfoCard(
-                  icon: Icons.calendar_today,
-                  label: 'Ngày tạo tài khoản',
-                  value: _formatDate(user.createdAt),
-                ),
                 const SizedBox(height: 12),
-                if (user.lastLogin != null)
+                if (widget.user.lastLogin != null)
                   _buildInfoCard(
                     icon: Icons.login,
                     label: 'Đăng nhập lần cuối',
-                    value: _formatDate(user.lastLogin!),
+                    value: _formatDate(widget.user.lastLogin!),
                   ),
-                if (user.lastLogin != null) const SizedBox(height: 12),
-                if (user.lastPracticeDate != null)
+                if (widget.user.lastLogin != null) const SizedBox(height: 12),
+                if (widget.user.lastPracticeDate != null)
                   _buildInfoCard(
                     icon: Icons.brush,
                     label: 'Lần luyện tập cuối',
-                    value: _formatDate(user.lastPracticeDate!),
+                    value: _formatDate(widget.user.lastPracticeDate!),
                   ),
 
                 const SizedBox(height: 40),
@@ -311,7 +349,7 @@ class UserDetailScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '${user.totalExp} EXP',
+                      '${widget.user.totalExp} EXP',
                       style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -319,7 +357,7 @@ class UserDetailScreen extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      'Từ ${user.totalAchievementExpGain} thành tích',
+                      'Từ ${widget.user.totalAchievementExpGain} thành tích',
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.white.withOpacity(0.6),

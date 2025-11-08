@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pianist_vip_pro/auth/auth_process/token_storage.dart';
 import 'package:pianist_vip_pro/models/user_model.dart';
 import 'package:pianist_vip_pro/screen/auth_screen/login_screen.dart';
+import 'package:pianist_vip_pro/screen/user/change_password_screen.dart';
 import 'package:pianist_vip_pro/screen/user/user_detail_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -36,7 +37,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _handleLogout(BuildContext context) async {
-    // Hiển thị dialog xác nhận
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -109,16 +109,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           CircleAvatar(
                             radius: 40,
                             backgroundColor: Colors.white.withOpacity(0.2),
-                            child: Text(
-                              _fullName.isNotEmpty
-                                  ? _fullName[0].toUpperCase()
-                                  : 'U',
-                              style: const TextStyle(
-                                fontSize: 32,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
+                            child: _user != null && _user!.avatarUrl != null
+                                ? ClipOval(
+                                    child: Image.network(
+                                      _user!.avatarUrl!,
+                                      width: 80,
+                                      height: 80,
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) =>
+                                              const Icon(Icons.person,
+                                                  size: 40,
+                                                  color: Colors.white),
+                                    ),
+                                  )
+                                : const Icon(Icons.person,
+                                    size: 40, color: Colors.white),
                           ),
                           const SizedBox(height: 16),
                           Text(
@@ -198,7 +204,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               size: 16,
                             ),
                             onTap: () {
-                              // TODO: Chuyển đến màn hình đổi mật khẩu
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const ChangePasswordScreen()));
                             },
                           ),
                         ],
